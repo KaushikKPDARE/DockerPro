@@ -1,0 +1,78 @@
+COMMANDS PERFORMED:
+
+ Pull the MySQL images from hub,
+sudo docker pull mysql:(tag)
+
+ Checking/listing images,
+sudo docker images
+
+ Checking/listing containers,
+sudo docker ps
+      (or)
+sudo docker ps -a
+
+ Running the containers with MySQL image,
+sudo docker run -it (mysql_container_name) /bin/bash
+
+ Create containers with image,
+sudo docker run -d --name=test-mysql -e MYSQL_ROOT_PASSWORD=mypass -v /var/lib/mysql mysql:(tag)
+
+ Entering the mysql_containers,
+sudo docker exec -it (mysql_container_name) /bin/bash
+
+ Getting the ip address of the containers,
+sudo docker inspect (mysql_container_name)
+
+ Scp the “tpcc_mysql_master” folder containing the necessary tables from local laptop to COE machine using WinScp.
+
+ Copying the folder from local host (coe machine) to server,
+scp -r tpcc-mysql-master dockuser@129.10.58.161:/home/dockuser/dockpro
+
+ Copying the files from host server to container,
+sudo docker cp /home/dockuser/dockpro/tpcc_mysql_master test-mysql5.6:/home
+
+ Give suitable permissions for the tpcc_mysql_master folder,
+chmod -r 777 /home
+
+ Renaming the container with mysql_container_name,
+sudo docker rename test-mysql1 test-mysql5.62
+
+ Stopping the container with particular mysql_container_name,
+sudo docker stop test-mysql5.62
+
+ Removing the container with particular mysql_container_name,
+sudo docker rm test-mysql5.62
+
+ Creating a database and inserting values by knowing root password,
+Step-1- Creating containers:
+sudo docker run -d --name=test-mysql -e MYSQL_ROOT_PASSWORD=mypass -v /var/lib/mysql mysql:5.6
+
+Step-2- Copy the folder to container:
+sudo docker cp /home/dockuser/dockpro/tpcc-mysql-master test-mysql1:/home
+
+Step-3- Enter into the container:
+sudo docker exec -it (container_name) bash
+
+Step-4- After entering home directory, give permissions:
+chmod -R 777 /home
+
+Step-5- After entering tpcc-mysql-master directory, install the mysql server, mysql client and libmysqlclient-dev:
+apt-get install mysql-server
+apt-get install mysql-client
+apt-get install libmysqlclient-dev
+
+Step-6- After installing, create the database:
+mysql -u root -p -e "CREATE DATABASE tpcc56;"
+Enter Password: "pass"
+
+Step-7- After installing, redirect the table into the database:
+mysql -u root -p tpcc56 < create_table.sql
+Enter Password: "pass"
+
+Step-8- After installing, redirect the table into the database:
+mysql -u root -p tpcc56 < add_fkey_idx.sql
+Enter Password: "pass"
+
+Step-9- After redirecting the tables into the database, use tpcc_load to load the data into the tables:
+./tpcc_load -h172.17.0.20 -d570tpcc -uroot -pmypass -w10 | tee /home/tpcc.txt
+./tpcc_start -h172.17.0.20 -d570tpcc -uroot -pmypass -w10 -c16 -r900 -l 3600 | tee tpcc_start.txt
